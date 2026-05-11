@@ -7,7 +7,7 @@ def estimate_cross(n: int, k: int):
     stern = Stern(problem, bit_complexities=1)
 
     return {
-        "time_complexity": stern.time_complexity(),
-        "memory_complexity": stern.memory_complexity(),
-        "optimal_ell": stern.ell()
-    }
+    "time": stern.time_complexity(),
+    "memory": stern.memory_complexity(),
+    "l": stern.ell()
+}
