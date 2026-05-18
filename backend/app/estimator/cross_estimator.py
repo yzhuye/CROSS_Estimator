@@ -1,6 +1,6 @@
 from cryptographic_estimators.CROSSEstimator import CROSSProblem
-from cryptographic_estimators.CROSSEstimator.CROSSAlgorithms import Stern
-from cryptographic_estimators.CROSSEstimator.CROSSAlgorithms.bjmm import BJMM
+from backend.cryptographic_estimators.CROSSEstimator.CROSSAlgorithms.RSDP import Stern
+from backend.cryptographic_estimators.CROSSEstimator.CROSSAlgorithms.RSDP.bjmm import BJMM
 
 
 def estimate_stern(n: int, k: int):

@@ -1,8 +1,8 @@
-from ..cross_algorithm import CROSSAlgorithm
+from ...cross_algorithm import CROSSAlgorithm
 from cryptographic_estimators.base_algorithm import optimal_parameter
 from math import log2, inf, lgamma, log
-from ..cross_constants import VerboseInformation
-from ..cross_helper import min_max
+from ...cross_constants import VerboseInformation
+from ...cross_helper import min_max
 
 def _log2_binom(n: int, k: int) -> float:
     if k < 0 or k > n:
@@ -258,7 +258,7 @@ class BJMM(CROSSAlgorithm):
                                     yield params
 
     def _compute_memory(self, parameters: dict):
-        n, k, p, z, z_D, alpha_E, alpha_D = self.problem.get_parameters()
+        n, k, p, z, z_D, _, alpha_E, alpha_D = self.problem.get_parameters()
         ell    = parameters.get("ell",    0)
         nu1    = parameters.get("nu1",    0)
         nu2    = parameters.get("nu2",    0)
@@ -303,7 +303,7 @@ class BJMM(CROSSAlgorithm):
 
 
     def _time_and_memory_complexity(self, parameters: dict, verbose_information=None):
-        n, k, p, z, z_D, alpha_E, alpha_D = self.problem.get_parameters()
+        n, k, p, z, _, z_D, alpha_E, alpha_D = self.problem.get_parameters()
         ell    = parameters.get("ell",    0)
         nu1    = parameters.get("nu1",    0)
         nu2    = parameters.get("nu2",    0)

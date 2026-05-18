@@ -1,11 +1,9 @@
-# cryptographic_estimators/CROSSEstimator/CROSSAlgorithms/stern.py
-
-from ..cross_algorithm import CROSSAlgorithm
+from ...cross_algorithm import CROSSAlgorithm
 from cryptographic_estimators.base_algorithm import optimal_parameter
 from types import SimpleNamespace
 from math import log2, inf
-from ..cross_constants import VerboseInformation
-from ..cross_helper import min_max
+from ...cross_constants import VerboseInformation
+from ...cross_helper import min_max
 
 
 class Stern(CROSSAlgorithm):
@@ -61,7 +59,7 @@ class Stern(CROSSAlgorithm):
             yield {"ell": ell, "r": self._optimal_parameters.get("r", 0)}
     
     def _compute_memory(self, parameters: dict):
-        n, k, p, z, _, _, _ = self.problem.get_parameters()
+        n, k, p, z, _, _, _, _ = self.problem.get_parameters()
         ell = parameters.get("ell", 0)
         half = (k + ell) // 2
         
@@ -73,7 +71,7 @@ class Stern(CROSSAlgorithm):
         return log2(mem) if mem > 0 else 0.0
     
     def _time_and_memory_complexity(self, parameters: dict, verbose_information=None):
-        n, k, p, z, _, _, _ = self.problem.get_parameters()
+        n, k, p, z, _, _, _, _ = self.problem.get_parameters()
         ell = parameters.get("ell", 0)
         half = (k + ell) // 2
         
