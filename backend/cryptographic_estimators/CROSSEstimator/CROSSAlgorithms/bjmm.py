@@ -155,6 +155,12 @@ class BJMM(CROSSAlgorithm):
         return False
 
     def _valid_choices(self):
+        """
+        Búsqueda en 2 fases para reducir tiempo sin perder precisión.
+        
+        Fase 1: Paso grueso (step=3 para nu1,nu2; step=4 para delta1; step=3 para delta2)
+        Fase 2: Paso fino alrededor del mejor de Fase 1
+        """
         new_ranges = self._fix_ranges_for_already_set_parameters()
         k = self.k
 
@@ -163,41 +169,93 @@ class BJMM(CROSSAlgorithm):
         if (k + min_ell) % 2 != 0:
             min_ell += 1
 
-        for ell in range(min_ell, max_ell + 1, 2):
-            v0   = k + ell
-            v0h  = v0 // 2
-            # nu1 debe tener paridad de v0h para que v1=v0h+nu1 sea par
-            nu1_start = v0h % 2
+        # Determinar si estamos en Fase 1 o Fase 2
+        already_has_ell = "ell" in self._optimal_parameters and self._optimal_parameters["ell"] is not None
+        
+        if not already_has_ell:
+            # ============================================================
+            # FASE 1: Búsqueda gruesa con pasos grandes
+            # ============================================================
+            step_nu = 3
+            step_delta1 = 4
+            step_delta2 = 3
+            
+            for ell in range(min_ell, max_ell + 1, 4):  # paso 4 en ell
+                v0 = k + ell
+                v0h = v0 // 2
+                nu1_start = v0h % 2
 
-            for nu1 in range(nu1_start,
-                             new_ranges["nu1"]["max"] + 1, 2):
-                v1  = v0h + nu1
-                v1h = v1 // 2
-                # nu2 debe tener paridad de v1h para que v2=v1h+nu2 sea par
-                nu2_start = v1h % 2
+                for nu1 in range(nu1_start, new_ranges["nu1"]["max"] + 1, max(2, step_nu)):
+                    v1 = v0h + nu1
+                    v1h = v1 // 2
+                    nu2_start = v1h % 2
 
-                for nu2 in range(nu2_start,
-                                 new_ranges["nu2"]["max"] + 1, 2):
+                    for nu2 in range(nu2_start, new_ranges["nu2"]["max"] + 1, max(2, step_nu)):
+                        
+                        for delta1 in range(0, new_ranges["delta1"]["max"] + 1, max(2, step_delta1)):
+                            d1h = delta1 // 2
+                            delta2_start = d1h % 2
 
-                    # delta1 par para que d1=delta1 sea par
-                    for delta1 in range(0,
-                                        new_ranges["delta1"]["max"] + 1, 2):
-                        d1h = delta1 // 2
-                        # delta2 con paridad de d1h para que d2=d1h+delta2 sea par
-                        delta2_start = d1h % 2
+                            for delta2 in range(delta2_start, new_ranges["delta2"]["max"] + 1, max(2, step_delta2)):
+                                params = {
+                                    "ell": ell, "nu1": nu1, "nu2": nu2,
+                                    "delta1": delta1, "delta2": delta2,
+                                    "r": self._optimal_parameters.get("r", 0),
+                                }
+                                if not self._are_parameters_invalid(params):
+                                    yield params
+        else:
+            # ============================================================
+            # FASE 2: Refinamiento alrededor del óptimo de Fase 1
+            # ============================================================
+            best_ell = self._optimal_parameters.get("ell", min_ell)
+            best_nu1 = self._optimal_parameters.get("nu1", 0)
+            best_nu2 = self._optimal_parameters.get("nu2", 0)
+            best_delta1 = self._optimal_parameters.get("delta1", 0)
+            best_delta2 = self._optimal_parameters.get("delta2", 0)
+            
+            # Ventana de búsqueda alrededor del óptimo
+            ell_range = range(max(min_ell, best_ell - 6), min(max_ell, best_ell + 7), 2)
+            nu1_range = range(max(0, best_nu1 - 4), min(new_ranges["nu1"]["max"], best_nu1 + 5))
+            nu2_range = range(max(0, best_nu2 - 4), min(new_ranges["nu2"]["max"], best_nu2 + 5))
+            delta1_range = range(max(0, best_delta1 - 4), min(new_ranges["delta1"]["max"], best_delta1 + 5), 2)
+            delta2_range = range(max(0, best_delta2 - 4), min(new_ranges["delta2"]["max"], best_delta2 + 5))
+            
+            for ell in ell_range:
+                v0 = k + ell
+                v0h = v0 // 2
+                nu1_start = v0h % 2
 
-                        for delta2 in range(delta2_start,
-                                            new_ranges["delta2"]["max"] + 1, 2):
-                            params = {
-                                "ell":    ell,
-                                "nu1":    nu1,
-                                "nu2":    nu2,
-                                "delta1": delta1,
-                                "delta2": delta2,
-                                "r":      self._optimal_parameters.get("r", 0),
-                            }
-                            if not self._are_parameters_invalid(params):
-                                yield params
+                for nu1 in nu1_range:
+                    if nu1 < nu1_start or (nu1 - nu1_start) % 2 != 0:
+                        # Ajustar paridad
+                        if nu1 % 2 != nu1_start % 2:
+                            continue
+                    v1 = v0h + nu1
+                    v1h = v1 // 2
+                    nu2_start = v1h % 2
+
+                    for nu2 in nu2_range:
+                        if nu2 < nu2_start or (nu2 - nu2_start) % 2 != 0:
+                            if nu2 % 2 != nu2_start % 2:
+                                continue
+                        
+                        for delta1 in delta1_range:
+                            d1h = delta1 // 2
+                            delta2_start = d1h % 2
+
+                            for delta2 in delta2_range:
+                                if delta2 < delta2_start or (delta2 - delta2_start) % 2 != 0:
+                                    if delta2 % 2 != delta2_start % 2:
+                                        continue
+                                
+                                params = {
+                                    "ell": ell, "nu1": nu1, "nu2": nu2,
+                                    "delta1": delta1, "delta2": delta2,
+                                    "r": self._optimal_parameters.get("r", 0),
+                                }
+                                if not self._are_parameters_invalid(params):
+                                    yield params
 
     def _compute_memory(self, parameters: dict):
         n, k, p, z, z_D, alpha_E, alpha_D = self.problem.get_parameters()

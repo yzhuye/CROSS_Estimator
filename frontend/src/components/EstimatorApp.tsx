@@ -26,9 +26,16 @@ export function EstimatorApp() {
     try {
       let result: EstimationResult = {}
 
-      if (selectedAttack === 'stern') {
+      // ──── STERN ────────────────────────────────────
+      if (selectedAttack === 'stern' || selectedAttack === 'both') {
         result.stern = await estimateComplexity.stern(parameters)
-      } 
+      }
+
+      // ──── BJMM ─────────────────────────────────────
+      if (selectedAttack === 'bjmm' || selectedAttack === 'both') {
+        result.bjmm = await estimateComplexity.bjmm(parameters)
+      }
+
       setResults(result)
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Unknown error'

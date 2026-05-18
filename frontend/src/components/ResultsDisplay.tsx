@@ -114,6 +114,7 @@ export function ResultsDisplay({
             title="BJMM Attack"
             time={results.bjmm.time}
             memory={results.bjmm.memory}
+            l={results.bjmm.ell}
           />
         )}
 
@@ -123,7 +124,7 @@ export function ResultsDisplay({
             title="Stern Attack"
             time={results.stern.time}
             memory={results.stern.memory}
-            l={results.stern.l}
+            l={results.stern.ell}
           />
         )}
 

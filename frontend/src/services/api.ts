@@ -1,21 +1,25 @@
-import { CrossParameters, SternResult } from '../lib/types'
+import { CrossParameters, SternResult, BJMMResult } from '../lib/types'
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
 export const estimateComplexity = {
   stern: async (params: CrossParameters): Promise<SternResult> => {
-    const response = await fetch(`${API_BASE}/cross`, {
+    const res = await fetch(`${API_BASE}/cross/stern`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(params),
     })
+    if (!res.ok) throw new Error(`Stern failed: ${res.statusText}`)
+    return res.json()
+  },
 
-    if (!response.ok) {
-      throw new Error(`Stern estimation failed: ${response.statusText}`)
-    }
-
-    return response.json()
+  bjmm: async (params: CrossParameters): Promise<BJMMResult> => {
+    const res = await fetch(`${API_BASE}/cross/bjmm`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(params),
+    })
+    if (!res.ok) throw new Error(`BJMM failed: ${res.statusText}`)
+    return res.json()
   },
 }

@@ -9,14 +9,23 @@ export function AttackSelector({
   selectedAttack,
   onAttackChange,
 }: AttackSelectorProps) {
-  const attacks: { value: AttackType; label: string; description: string }[] =
-    [
-      {
-        value: 'stern',
-        label: 'Stern',
-        description: 'Stern&apos;s information set decoding attack',
-      },
-    ]
+  const attacks: { value: AttackType; label: string; description: string }[] = [
+    {
+      value: 'stern',
+      label: 'Stern',
+      description: 'Stern/Dumer information set decoding attack',
+    },
+    {
+      value: 'bjmm',
+      label: 'BJMM',
+      description: 'Becker-Joux-May-Meurer representation technique',
+    },
+    {
+      value: 'both',
+      label: 'Both',
+      description: 'Compare Stern and BJMM attacks',
+    },
+  ]
 
   return (
     <div className="w-full space-y-4">
