@@ -25,9 +25,9 @@ P = 127                       # Característica del cuerpo finito (CROSS default
 # Empezamos con grilla CONSERVADORA para validar el pipeline.
 # Expandir después según design_experimental.pdf.
 N_VALUES   = [4, 6, 8, 10, 12]   # Tamaño del problema
-K_RATIOS   = [0.5]               # k = round(n * ratio)
+K_RATIOS   = [0.3, 0.5, 0.7]           # k = round(n * ratio)
 W_RATIOS   = [1.0]               # w = round(n * ratio); 1.0 = peso completo
-Z_VALUES   = [7]                 # Orden del subgrupo (CROSS default)
+Z_VALUES   = [3, 7]              # Orden del subgrupo (CROSS default)
 SEEDS_PER_CONFIG = 5             # Repeticiones por (n, k, w, z)
 
 # ─────────────────────────────────────────────────
