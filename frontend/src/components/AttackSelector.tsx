@@ -1,56 +1,69 @@
 import { AttackType } from '../lib/types'
 
 interface AttackSelectorProps {
-  selectedAttack: AttackType
-  onAttackChange: (attack: AttackType) => void
+  selectedAttacks: AttackType[]
+  onAttackChange: (attacks: AttackType[]) => void
 }
 
+const ATTACKS: { value: AttackType; label: string; description: string }[] = [
+  {
+    value: 'stern',
+    label: 'Stern',
+    description: 'Stern/Dumer information set decoding attack',
+  },
+  {
+    value: 'bjmm',
+    label: 'BJMM',
+    description: 'Becker-Joux-May-Meurer representation technique',
+  },
+]
+
 export function AttackSelector({
-  selectedAttack,
+  selectedAttacks,
   onAttackChange,
 }: AttackSelectorProps) {
-  const attacks: { value: AttackType; label: string; description: string }[] = [
-    {
-      value: 'stern',
-      label: 'Stern',
-      description: 'Stern/Dumer information set decoding attack',
-    },
-    {
-      value: 'bjmm',
-      label: 'BJMM',
-      description: 'Becker-Joux-May-Meurer representation technique',
-    },
-    {
-      value: 'both',
-      label: 'Both',
-      description: 'Compare Stern and BJMM attacks',
-    },
-  ]
+  const toggleAttack = (attack: AttackType) => {
+    if (selectedAttacks.includes(attack)) {
+      onAttackChange(selectedAttacks.filter((a) => a !== attack))
+    } else {
+      onAttackChange([...selectedAttacks, attack])
+    }
+  }
 
   return (
     <div className="w-full space-y-4">
-      <h2 className="text-xl font-semibold">Select Attack</h2>
+      <h2 className="text-xl font-semibold">Select Attacks</h2>
       <div className="grid grid-cols-1 gap-2">
-        {attacks.map((attack) => (
+        {ATTACKS.map((attack) => (
           <button
             key={attack.value}
-            onClick={() => onAttackChange(attack.value)}
+            onClick={() => toggleAttack(attack.value)}
             className={`relative p-4 rounded-lg border-2 transition-all text-left ${
-              selectedAttack === attack.value
+              selectedAttacks.includes(attack.value)
                 ? 'border-blue-600 bg-blue-50 dark:bg-blue-950'
                 : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
             }`}
           >
             <div className="flex items-center">
               <div
-                className={`w-4 h-4 rounded-full border-2 mr-3 flex items-center justify-center transition-colors ${
-                  selectedAttack === attack.value
+                className={`w-4 h-4 rounded border-2 mr-3 flex items-center justify-center transition-colors ${
+                  selectedAttacks.includes(attack.value)
                     ? 'border-blue-600 bg-blue-600'
                     : 'border-gray-300'
                 }`}
               >
-                {selectedAttack === attack.value && (
-                  <div className="w-1.5 h-1.5 bg-white rounded-full" />
+                {selectedAttacks.includes(attack.value) && (
+                  <svg
+                    className="w-3 h-3 text-white"
+                    fill="none"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path d="M5 13l4 4L19 7" />
+                  </svg>
                 )}
               </div>
               <div>
@@ -63,6 +76,12 @@ export function AttackSelector({
           </button>
         ))}
       </div>
+      
+      {selectedAttacks.length === 0 && (
+        <p className="text-sm text-red-500 dark:text-red-400">
+          Please select at least one attack
+        </p>
+      )}
     </div>
   )
 }

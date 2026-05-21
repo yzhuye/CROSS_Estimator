@@ -5,6 +5,11 @@ export interface CrossParameters {
   k: number
 }
 
+export interface DataPoint {
+  ell: number
+  time: number
+}
+
 export interface SternResult {
   algorithm: string
   n: number
@@ -13,6 +18,12 @@ export interface SternResult {
   time: number
   memory: number
   ell: number
+  optimal: {
+    ell: number
+    time: number
+    memory: number
+  }
+  data: DataPoint[]
 }
 
 export interface BJMMResult {
@@ -27,6 +38,12 @@ export interface BJMMResult {
   nu2: number
   delta1: number
   delta2: number
+  optimal: {
+    ell: number
+    time: number
+    memory: number
+  }
+  data: DataPoint[]
 }
 
 export interface EstimationResult {

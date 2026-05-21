@@ -6,33 +6,38 @@ import { AttackSelector } from './AttackSelector'
 import { ResultsDisplay } from './ResultsDisplay'
 
 const DEFAULT_PARAMETERS: CrossParameters = {
-  n: 64,
-  k: 11,
+  n: 127,
+  k: 76,
 }
 
 export function EstimatorApp() {
   const [parameters, setParameters] = useState<CrossParameters>(
     DEFAULT_PARAMETERS
   )
-  const [selectedAttack, setSelectedAttack] = useState<AttackType>('both')
+  const [selectedAttacks, setSelectedAttacks] = useState<AttackType[]>(["stern"]);
   const [results, setResults] = useState<EstimationResult | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   const handleCalculate = async () => {
+    if (selectedAttacks.length === 0) {
+      setError('Please select at least one attack')
+      return
+    }
+
     setIsLoading(true)
     setError(null)
 
     try {
-      let result: EstimationResult = {}
+      const result: EstimationResult = {}
 
       // ──── STERN ────────────────────────────────────
-      if (selectedAttack === 'stern' || selectedAttack === 'both') {
+      if (selectedAttacks.includes('stern')) {
         result.stern = await estimateComplexity.stern(parameters)
       }
 
       // ──── BJMM ─────────────────────────────────────
-      if (selectedAttack === 'bjmm' || selectedAttack === 'both') {
+      if (selectedAttacks.includes('bjmm')) {
         result.bjmm = await estimateComplexity.bjmm(parameters)
       }
 
@@ -75,8 +80,8 @@ export function EstimatorApp() {
 
             <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm p-6 border border-slate-200 dark:border-slate-700">
               <AttackSelector
-                selectedAttack={selectedAttack}
-                onAttackChange={setSelectedAttack}
+                selectedAttacks={selectedAttacks}
+                onAttackChange={setSelectedAttacks}
               />
             </div>
           </div>
@@ -88,7 +93,7 @@ export function EstimatorApp() {
                 results={results}
                 isLoading={isLoading}
                 error={error}
-                selectedAttack={selectedAttack}
+                selectedAttacks={selectedAttacks}
               />
             </div>
           </div>
