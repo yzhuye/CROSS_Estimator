@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Activity, Binary, Braces, ShieldCheck } from 'lucide-react'
 import { CrossParameters, EstimationResult, AttackType } from '../lib/types'
 import { estimateComplexity } from '../services/api'
 import { ParameterPanel } from './ParameterPanel'
@@ -11,10 +12,11 @@ const DEFAULT_PARAMETERS: CrossParameters = {
 }
 
 export function EstimatorApp() {
-  const [parameters, setParameters] = useState<CrossParameters>(
-    DEFAULT_PARAMETERS
-  )
-  const [selectedAttacks, setSelectedAttacks] = useState<AttackType[]>(["stern"]);
+  const [parameters, setParameters] =
+    useState<CrossParameters>(DEFAULT_PARAMETERS)
+  const [selectedAttacks, setSelectedAttacks] = useState<AttackType[]>([
+    'stern',
+  ])
   const [results, setResults] = useState<EstimationResult | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -31,12 +33,10 @@ export function EstimatorApp() {
     try {
       const result: EstimationResult = {}
 
-      // ──── STERN ────────────────────────────────────
       if (selectedAttacks.includes('stern')) {
         result.stern = await estimateComplexity.stern(parameters)
       }
 
-      // ──── BJMM ─────────────────────────────────────
       if (selectedAttacks.includes('bjmm')) {
         result.bjmm = await estimateComplexity.bjmm(parameters)
       }
@@ -52,60 +52,86 @@ export function EstimatorApp() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900 p-6">
-      <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-2 text-slate-900 dark:text-white">
-            CROSS Complexity Estimator
-          </h1>
-          <p className="text-lg text-slate-600 dark:text-slate-300">
-            Estimate the computational complexity of attacks against the CROSS
-            cryptographic scheme
-          </p>
-        </div>
+    <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(20,184,166,0.12),transparent_34rem),linear-gradient(180deg,#f8fbfb_0%,#eef3f5_100%)]">
+      <div className="mx-auto flex min-h-screen max-w-7xl flex-col px-4 py-5 sm:px-6 lg:px-8">
+        <header className="mb-6 border-b border-slate-200/80 pb-5">
+          <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+            <div className="max-w-3xl">
+              <div className="mb-3 flex flex-wrap items-center gap-2 text-xs font-medium uppercase tracking-[0.16em] text-teal-700">
+                <span className="inline-flex items-center gap-2 rounded-md border border-teal-200 bg-white/75 px-2.5 py-1 shadow-sm">
+                  <ShieldCheck className="size-3.5" />
+                  Post-Quantum Cryptography
+                </span>
+                <span className="text-slate-400">CROSS / R-SDP</span>
+              </div>
+              <h1 className="text-3xl font-semibold leading-tight text-slate-950 sm:text-4xl">
+                CROSS Complexity Estimator
+              </h1>
+              <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600 sm:text-base">
+                Quantitative estimation interface for decoding attacks over
+                restricted syndrome decoding instances.
+              </p>
+            </div>
 
-        {/* Main content */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          {/* Left sidebar */}
-          <div className="lg:col-span-4 space-y-8">
-            <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm p-6 border border-slate-200 dark:border-slate-700">
+            <div className="grid grid-cols-3 gap-2 rounded-lg border border-slate-200 bg-white/75 p-2 shadow-sm shadow-slate-200/50 backdrop-blur">
+              <div className="min-w-0 rounded-md bg-slate-50 px-3 py-2">
+                <div className="flex items-center gap-1.5 text-xs text-slate-500">
+                  <Binary className="size-3.5 text-teal-700" />
+                  Field
+                </div>
+                <p className="mt-1 text-sm font-semibold text-slate-900">
+                  F<sub>127</sub>
+                </p>
+              </div>
+              <div className="min-w-0 rounded-md bg-slate-50 px-3 py-2">
+                <div className="flex items-center gap-1.5 text-xs text-slate-500">
+                  <Braces className="size-3.5 text-indigo-600" />
+                  Subgroup
+                </div>
+                <p className="mt-1 text-sm font-semibold text-slate-900">
+                  z = 7
+                </p>
+              </div>
+              <div className="min-w-0 rounded-md bg-slate-50 px-3 py-2">
+                <div className="flex items-center gap-1.5 text-xs text-slate-500">
+                  <Activity className="size-3.5 text-amber-600" />
+                  Attacks
+                </div>
+                <p className="mt-1 text-sm font-semibold text-slate-900">
+                  {selectedAttacks.length || 0}
+                </p>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <div className="grid flex-1 grid-cols-1 gap-5 lg:grid-cols-[360px_minmax(0,1fr)]">
+          <aside className="space-y-5">
+            <section className="rounded-lg border border-slate-200 bg-white/90 p-5 shadow-sm shadow-slate-200/60">
               <ParameterPanel
                 parameters={parameters}
                 onParametersChange={setParameters}
                 onCalculate={handleCalculate}
                 isLoading={isLoading}
               />
-            </div>
+            </section>
 
-            <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm p-6 border border-slate-200 dark:border-slate-700">
+            <section className="rounded-lg border border-slate-200 bg-white/90 p-5 shadow-sm shadow-slate-200/60">
               <AttackSelector
                 selectedAttacks={selectedAttacks}
                 onAttackChange={setSelectedAttacks}
               />
-            </div>
-          </div>
+            </section>
+          </aside>
 
-          {/* Right content area */}
-          <div className="lg:col-span-8">
-            <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm p-6 border border-slate-200 dark:border-slate-700">
-              <ResultsDisplay
-                results={results}
-                isLoading={isLoading}
-                error={error}
-                selectedAttacks={selectedAttacks}
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Footer info */}
-        <div className="mt-12 text-center text-sm text-slate-600 dark:text-slate-400">
-          <p>
-            This tool estimates attack complexity based on the CROSS
-            specification. Results are approximations and should be validated
-            against academic literature.
-          </p>
+          <main className="min-w-0 rounded-lg border border-slate-200 bg-white/90 p-5 shadow-sm shadow-slate-200/60 lg:p-6">
+            <ResultsDisplay
+              results={results}
+              isLoading={isLoading}
+              error={error}
+              selectedAttacks={selectedAttacks}
+            />
+          </main>
         </div>
       </div>
     </div>

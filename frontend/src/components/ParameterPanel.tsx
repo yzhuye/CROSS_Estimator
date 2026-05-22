@@ -1,6 +1,7 @@
 import { CrossParameters } from '../lib/types'
 import { Button } from './ui/button'
 import { Input } from './ui/input'
+import { Calculator, Gauge, Ruler } from 'lucide-react'
 
 interface ParameterPanelProps {
   parameters: CrossParameters
@@ -33,12 +34,28 @@ export function ParameterPanel({
   }
 
   return (
-    <div className="w-full max-w-md space-y-6">
-      <div className="space-y-4">
-        <h2 className="text-xl font-semibold">CROSS Parameters</h2>
+    <div className="w-full space-y-5">
+      <div>
+        <div className="flex items-center gap-2">
+          <span className="flex size-8 items-center justify-center rounded-md bg-teal-50 text-teal-700 ring-1 ring-teal-100">
+            <Gauge className="size-4" />
+          </span>
+          <div>
+            <h2 className="text-base font-semibold text-slate-950">
+              CROSS Parameters
+            </h2>
+            <p className="text-xs text-slate-500">NIST presets or custom code.</p>
+          </div>
+        </div>
+      </div>
 
+      <div className="space-y-4">
         <div className="space-y-2">
-          <label htmlFor="n" className="block text-sm font-medium">
+          <label
+            htmlFor="n"
+            className="flex items-center gap-1.5 text-sm font-medium text-slate-700"
+          >
+            <Ruler className="size-3.5 text-slate-400" />
             n (Code Length)
           </label>
           <Input
@@ -47,15 +64,19 @@ export function ParameterPanel({
             min="1"
             value={parameters.n}
             onChange={(e) => handleChange('n', parseInt(e.target.value, 10))}
-            className="w-full"
+            className="h-10 w-full border-slate-200 bg-slate-50/80 text-slate-950 shadow-inner shadow-slate-200/40 focus-visible:border-teal-500 focus-visible:ring-teal-500/20"
           />
-          <p className="text-xs text-muted-foreground">
+          <p className="text-xs text-slate-500">
             Length of the linear code
           </p>
         </div>
 
         <div className="space-y-2">
-          <label htmlFor="k" className="block text-sm font-medium">
+          <label
+            htmlFor="k"
+            className="flex items-center gap-1.5 text-sm font-medium text-slate-700"
+          >
+            <Ruler className="size-3.5 text-slate-400" />
             k (Code Dimension)
           </label>
           <Input
@@ -64,22 +85,24 @@ export function ParameterPanel({
             min="1"
             value={parameters.k}
             onChange={(e) => handleChange('k', parseInt(e.target.value, 10))}
-            className="w-full"
+            className="h-10 w-full border-slate-200 bg-slate-50/80 text-slate-950 shadow-inner shadow-slate-200/40 focus-visible:border-teal-500 focus-visible:ring-teal-500/20"
           />
-          <p className="text-xs text-muted-foreground">
+          <p className="text-xs text-slate-500">
             Dimension of the linear code
           </p>
         </div>
       </div>
 
       <div className="space-y-2">
-        <h3 className="text-sm font-medium">Parameter Presets</h3>
+        <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+          Parameter Presets
+        </h3>
         <div className="grid grid-cols-3 gap-2">
           <Button
             variant="outline"
             size="sm"
             onClick={() => applyPreset(presets.cross64)}
-            className="w-full text-xs"
+            className="h-9 w-full border-slate-200 bg-white text-xs text-slate-700 hover:border-teal-200 hover:bg-teal-50 hover:text-teal-800"
           >
             NIST-1
           </Button>
@@ -87,7 +110,7 @@ export function ParameterPanel({
             variant="outline"
             size="sm"
             onClick={() => applyPreset(presets.cross128)}
-            className="w-full text-xs"
+            className="h-9 w-full border-slate-200 bg-white text-xs text-slate-700 hover:border-indigo-200 hover:bg-indigo-50 hover:text-indigo-800"
           >
             NIST-3
           </Button>
@@ -95,7 +118,7 @@ export function ParameterPanel({
             variant="outline"
             size="sm"
             onClick={() => applyPreset(presets.cross256)}
-            className="w-full text-xs"
+            className="h-9 w-full border-slate-200 bg-white text-xs text-slate-700 hover:border-amber-200 hover:bg-amber-50 hover:text-amber-800"
           >
             NIST-5
           </Button>
@@ -105,8 +128,9 @@ export function ParameterPanel({
       <Button
         onClick={onCalculate}
         disabled={isLoading}
-        className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+        className="h-10 w-full bg-teal-700 text-white shadow-sm shadow-teal-900/20 hover:bg-teal-800"
       >
+        <Calculator className="size-4" />
         {isLoading ? 'Calculating...' : 'Calculate Complexity'}
       </Button>
     </div>
