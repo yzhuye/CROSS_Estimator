@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from app.schemas import CrossRequest, RSDPGRequest
-from app.service import analyze_stern, analyze_bjmm, analyze_groebner, analyze_stern_g
+from app.service import analyze_stern, analyze_bjmm, analyze_groebner, analyze_stern_g, analyze_collision_search
 
 router = APIRouter()
 
@@ -23,3 +23,8 @@ def cross_groebner(data: CrossRequest):
 def rsdpg_stern(data: RSDPGRequest):
     """Estima seguridad con Stern sobre R-SDP(G) (ignora estructura de G)."""
     return analyze_stern_g(data.n, data.k, data.m, data.z, data.p)
+
+@router.post("/rsdpg/collision-search")
+def rsdpg_collision_search(data: RSDPGRequest):
+    """Submatrix Stern/Dumer (Teorema 15) — mejor ataque conocido sobre R-SDP(G)."""
+    return analyze_collision_search(data.n, data.k, data.m, data.z, data.p)

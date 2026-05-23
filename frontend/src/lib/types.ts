@@ -1,4 +1,4 @@
-export type AttackType = 'stern' | 'bjmm' | 'groebner' | 'stern_g'
+export type AttackType = 'stern' | 'bjmm' | 'groebner' | 'stern_g' | 'collision_search'
 
 export interface CrossParameters {
   n: number
@@ -54,9 +54,28 @@ export interface SternGResult {
   data: DataPoint[]
 }
 
+export interface CollisionSearchResult {
+  algorithm: string
+  n: number
+  k: number
+  m: number
+  z: number
+  optimal: {
+    ja:     number | null
+    jb:     number | null
+    da:     number | null
+    db:     number | null
+    rho_a:  number | null
+    rho_b:  number | null
+    time:   number | null
+    memory: number | null
+  }
+}
+
 export interface EstimationResult {
-  stern?:    SternResult
-  bjmm?:     BJMMResult
-  groebner?: GroebnerResult
-  stern_g?:  SternGResult
+  stern?:            SternResult
+  bjmm?:             BJMMResult
+  groebner?:         GroebnerResult
+  stern_g?:          SternGResult
+  collision_search?: CollisionSearchResult
 }

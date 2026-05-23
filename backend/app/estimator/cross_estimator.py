@@ -139,6 +139,46 @@ def estimate_groebner(n: int, k: int, z: int = 7, omega: float = 2.0):
     }
 
 
+def estimate_collision_search(n: int, k: int, m: int, z: int = 127, p: int = 509):
+    """Ejecuta Submatrix Stern/Dumer (Teorema 15) sobre R-SDP(G).
+
+    Optimiza sobre (ja, jb, da, db). Validación: NIST-1 debe dar tiempo en [2^143.1, 2^144.5].
+    """
+    from cryptographic_estimators.CROSSEstimator.CROSSAlgorithms.RSDPG import CollisionSearch
+
+    problem = CROSSProblem(n=n, k=k, z=z, p=p, m=m)
+    algo = CollisionSearch(problem, bit_complexities=1)
+
+    best_time   = inf
+    best_memory = inf
+    best_params = None
+
+    for params in algo._valid_choices():
+        try:
+            time, memory = algo._time_and_memory_complexity(params)
+            if time < best_time and time != inf:
+                best_time   = time
+                best_memory = memory
+                best_params = dict(params)
+        except Exception:
+            continue
+
+    return {
+        "algorithm": "CollisionSearch",
+        "n": n, "k": k, "m": m, "z": z,
+        "optimal": {
+            "ja":    best_params["ja"]  if best_params else None,
+            "jb":    best_params["jb"]  if best_params else None,
+            "da":    best_params["da"]  if best_params else None,
+            "db":    best_params["db"]  if best_params else None,
+            "rho_a": best_params["ja"] - best_params["da"] if best_params else None,
+            "rho_b": best_params["jb"] - best_params["db"] if best_params else None,
+            "time":   round(best_time,   2) if best_time   != inf else None,
+            "memory": round(best_memory, 2) if best_memory != inf else None,
+        },
+    }
+
+
 def estimate_stern_g(n: int, k: int, m: int, z: int = 127, p: int = 509):
     """Ejecuta Stern_G sobre R-SDP(G). Itera sobre ell y retorna el óptimo."""
     problem = CROSSProblem(n=n, k=k, z=z, p=p, m=m)

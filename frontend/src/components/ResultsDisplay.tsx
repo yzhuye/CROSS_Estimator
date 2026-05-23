@@ -59,8 +59,8 @@ function prepareChartData(
     })
 }
 
-type Tone = 'teal' | 'indigo' | 'violet' | 'amber' | 'orange'
-type AccentColor = 'teal' | 'indigo' | 'violet' | 'orange'
+type Tone = 'teal' | 'indigo' | 'violet' | 'amber' | 'orange' | 'emerald'
+type AccentColor = 'teal' | 'indigo' | 'violet' | 'orange' | 'emerald'
 
 function MetricBlock({
   icon: Icon,
@@ -74,11 +74,12 @@ function MetricBlock({
   tone: Tone
 }) {
   const toneClass: Record<Tone, string> = {
-    teal:   'bg-teal-50 text-teal-700 ring-teal-100',
-    indigo: 'bg-indigo-50 text-indigo-700 ring-indigo-100',
-    violet: 'bg-violet-50 text-violet-700 ring-violet-100',
-    amber:  'bg-amber-50 text-amber-700 ring-amber-100',
-    orange: 'bg-orange-50 text-orange-700 ring-orange-100',
+    teal:    'bg-teal-50 text-teal-700 ring-teal-100',
+    indigo:  'bg-indigo-50 text-indigo-700 ring-indigo-100',
+    violet:  'bg-violet-50 text-violet-700 ring-violet-100',
+    amber:   'bg-amber-50 text-amber-700 ring-amber-100',
+    orange:  'bg-orange-50 text-orange-700 ring-orange-100',
+    emerald: 'bg-emerald-50 text-emerald-700 ring-emerald-100',
   }
 
   return (
@@ -110,13 +111,14 @@ function ResultCard({
   accent: AccentColor
 }) {
   const borderClass: Record<AccentColor, string> = {
-    teal:   'border-t-teal-600',
-    indigo: 'border-t-indigo-600',
-    violet: 'border-t-violet-600',
-    orange: 'border-t-orange-600',
+    teal:    'border-t-teal-600',
+    indigo:  'border-t-indigo-600',
+    violet:  'border-t-violet-600',
+    orange:  'border-t-orange-600',
+    emerald: 'border-t-emerald-600',
   }
   const metricTone: Record<AccentColor, Tone> = {
-    teal: 'teal', indigo: 'indigo', violet: 'violet', orange: 'orange',
+    teal: 'teal', indigo: 'indigo', violet: 'violet', orange: 'orange', emerald: 'emerald',
   }
 
   if (time == null || memory == null) {
@@ -209,10 +211,11 @@ export function ResultsDisplay({ results, isLoading, error, selectedAttacks }: R
     )
   }
 
-  const showStern    = selectedAttacks.includes('stern')    && results.stern    != null
-  const showBjmm     = selectedAttacks.includes('bjmm')     && results.bjmm     != null
-  const showGroebner = selectedAttacks.includes('groebner') && results.groebner != null
-  const showSternG   = selectedAttacks.includes('stern_g')  && results.stern_g  != null
+  const showStern       = selectedAttacks.includes('stern')           && results.stern           != null
+  const showBjmm        = selectedAttacks.includes('bjmm')            && results.bjmm            != null
+  const showGroebner    = selectedAttacks.includes('groebner')        && results.groebner        != null
+  const showSternG      = selectedAttacks.includes('stern_g')         && results.stern_g         != null
+  const showCollision   = selectedAttacks.includes('collision_search') && results.collision_search != null
 
   const sternTime    = results.stern?.optimal?.time
   const sternMemory  = results.stern?.optimal?.memory
@@ -229,6 +232,11 @@ export function ResultsDisplay({ results, isLoading, error, selectedAttacks }: R
   const sternGTime   = results.stern_g?.optimal?.time
   const sternGMemory = results.stern_g?.optimal?.memory
   const sternGEll    = results.stern_g?.optimal?.ell
+
+  const csTime   = results.collision_search?.optimal?.time
+  const csMemory = results.collision_search?.optimal?.memory
+  const csJa     = results.collision_search?.optimal?.ja
+  const csJb     = results.collision_search?.optimal?.jb
 
   const chartData = prepareChartData(
     results.stern?.data,
@@ -248,7 +256,8 @@ export function ResultsDisplay({ results, isLoading, error, selectedAttacks }: R
   if (showStern    && sternTime    != null && sternMemory    != null) times.push({ label: 'Stern',    time: sternTime,    memory: sternMemory })
   if (showBjmm     && bjmmTime     != null && bjmmMemory     != null) times.push({ label: 'BJMM',     time: bjmmTime,     memory: bjmmMemory })
   if (showGroebner && groebnerTime != null && groebnerMemory != null) times.push({ label: 'Gröbner',  time: groebnerTime, memory: groebnerMemory })
-  if (showSternG   && sternGTime   != null && sternGMemory   != null) times.push({ label: 'Stern_G',  time: sternGTime,   memory: sternGMemory })
+  if (showSternG    && sternGTime != null && sternGMemory != null) times.push({ label: 'Stern_G',             time: sternGTime, memory: sternGMemory })
+  if (showCollision && csTime    != null && csMemory    != null) times.push({ label: 'Submatrix Stern/Dumer', time: csTime,     memory: csMemory })
 
   const fastest = times.length > 0 ? times.reduce((a, b) => a.time   < b.time   ? a : b) : null
   const lowMem  = times.length > 0 ? times.reduce((a, b) => a.memory < b.memory ? a : b) : null
@@ -267,10 +276,18 @@ export function ResultsDisplay({ results, isLoading, error, selectedAttacks }: R
       </div>
 
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
-        {showStern    && <ResultCard title="Stern Attack"        time={sternTime}    memory={sternMemory}    ell={sternEll}   accent="teal"   />}
-        {showBjmm     && <ResultCard title="BJMM Attack"         time={bjmmTime}     memory={bjmmMemory}     ell={bjmmEll}    accent="indigo" />}
-        {showGroebner && <ResultCard title="Gröbner Basis (F5)"  time={groebnerTime} memory={groebnerMemory} dReg={groebnerDReg} accent="violet" />}
-        {showSternG   && <ResultCard title="Stern R-SDP(G)"      time={sternGTime}   memory={sternGMemory}   ell={sternGEll}  accent="orange" />}
+        {showStern     && <ResultCard title="Stern Attack"                  time={sternTime}    memory={sternMemory}    ell={sternEll}      accent="teal"    />}
+        {showBjmm      && <ResultCard title="BJMM Attack"                   time={bjmmTime}     memory={bjmmMemory}     ell={bjmmEll}       accent="indigo"  />}
+        {showGroebner  && <ResultCard title="Gröbner Basis (F5)"            time={groebnerTime} memory={groebnerMemory} dReg={groebnerDReg} accent="violet"  />}
+        {showSternG    && <ResultCard title="Stern R-SDP(G)"                time={sternGTime}   memory={sternGMemory}   ell={sternGEll}     accent="orange"  />}
+        {showCollision && (
+          <ResultCard
+            title={`Submatrix Stern/Dumer${csJa != null ? ` (ja=${csJa}, jb=${csJb})` : ''}`}
+            time={csTime}
+            memory={csMemory}
+            accent="emerald"
+          />
+        )}
       </div>
 
       {showChart && (

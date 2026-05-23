@@ -24,7 +24,8 @@ export function EstimatorApp() {
       if (selectedAttacks.includes('stern'))    result.stern    = await estimateComplexity.stern(parameters)
       if (selectedAttacks.includes('bjmm'))     result.bjmm     = await estimateComplexity.bjmm(parameters)
       if (selectedAttacks.includes('groebner')) result.groebner = await estimateComplexity.groebner(parameters)
-      if (selectedAttacks.includes('stern_g'))  result.stern_g  = await estimateComplexity.stern_g(parameters)
+      if (selectedAttacks.includes('stern_g'))         result.stern_g         = await estimateComplexity.stern_g(parameters)
+      if (selectedAttacks.includes('collision_search')) result.collision_search = await estimateComplexity.collision_search(parameters)
       setResults(result)
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Unknown error'

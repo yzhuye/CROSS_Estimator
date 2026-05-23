@@ -1,5 +1,5 @@
 import { AttackType } from '../lib/types'
-import { Check, GitBranch, Network, FlaskConical, Layers } from 'lucide-react'
+import { Check, GitBranch, Network, FlaskConical, Layers, Zap } from 'lucide-react'
 
 interface AttackSelectorProps {
   selectedAttacks: AttackType[]
@@ -41,6 +41,13 @@ const ATTACKS: {
     icon: Layers,
     accent: 'orange',
   },
+  {
+    value: 'collision_search',
+    label: 'Submatrix Stern/Dumer',
+    description: 'Hybrid attack on R-SDP(G) — exploits subgroup G structure (Theorem 15)',
+    icon: Zap,
+    accent: 'emerald',
+  },
 ]
 
 export function AttackSelector({ selectedAttacks, onAttackChange }: AttackSelectorProps) {
@@ -57,7 +64,8 @@ export function AttackSelector({ selectedAttacks, onAttackChange }: AttackSelect
       teal:   { card: 'border-teal-300 bg-teal-50/80 text-teal-950',     icon: 'bg-teal-100 text-teal-700 ring-teal-200',     check: 'border-teal-700 bg-teal-700' },
       indigo: { card: 'border-indigo-300 bg-indigo-50/80 text-indigo-950', icon: 'bg-indigo-100 text-indigo-700 ring-indigo-200', check: 'border-indigo-700 bg-indigo-700' },
       violet: { card: 'border-violet-300 bg-violet-50/80 text-violet-950', icon: 'bg-violet-100 text-violet-700 ring-violet-200', check: 'border-violet-700 bg-violet-700' },
-      orange: { card: 'border-orange-300 bg-orange-50/80 text-orange-950', icon: 'bg-orange-100 text-orange-700 ring-orange-200', check: 'border-orange-700 bg-orange-700' },
+      orange:  { card: 'border-orange-300 bg-orange-50/80 text-orange-950',   icon: 'bg-orange-100 text-orange-700 ring-orange-200',   check: 'border-orange-700 bg-orange-700' },
+      emerald: { card: 'border-emerald-300 bg-emerald-50/80 text-emerald-950', icon: 'bg-emerald-100 text-emerald-700 ring-emerald-200', check: 'border-emerald-700 bg-emerald-700' },
     }
     return selected ? map[accent] : { card: 'border-slate-200 bg-white text-slate-800', icon: 'bg-slate-50 text-slate-500 ring-slate-200', check: 'border-slate-300 bg-white text-transparent' }
   }
