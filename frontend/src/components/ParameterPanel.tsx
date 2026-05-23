@@ -48,7 +48,7 @@ export function ParameterPanel({
   isLoading,
   selectedAttacks,
 }: ParameterPanelProps) {
-  const showSternG = selectedAttacks.includes('stern_g')
+  const showSternG = selectedAttacks.some((a) => a === 'stern_g' || a === 'collision_search')
 
   const handleChange = (field: keyof CrossParameters, value: number) => {
     onParametersChange({ ...parameters, [field]: value })

@@ -6,7 +6,11 @@ import { ParameterPanel } from './ParameterPanel'
 import { AttackSelector } from './AttackSelector'
 import { ResultsDisplay } from './ResultsDisplay'
 
-const DEFAULT_PARAMETERS: CrossParameters = { n: 127, k: 76, z: 7 }
+const DEFAULT_PARAMETERS:   CrossParameters = { n: 127, k: 76,  z: 7 }
+const DEFAULT_PARAMETERS_G: CrossParameters = { n: 55,  k: 36,  z: 127, m: 25, p: 509 }
+
+const RSDPG_ATTACKS = new Set<AttackType>(['stern_g', 'collision_search'])
+const isRSDPG = (attacks: AttackType[]) => attacks.some((a) => RSDPG_ATTACKS.has(a))
 
 export function EstimatorApp() {
   const [parameters, setParameters] = useState<CrossParameters>(DEFAULT_PARAMETERS)
@@ -14,6 +18,14 @@ export function EstimatorApp() {
   const [results, setResults] = useState<EstimationResult | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  const handleAttackChange = (attacks: AttackType[]) => {
+    const switchingToG   = !isRSDPG(selectedAttacks) && isRSDPG(attacks)
+    const switchingFromG =  isRSDPG(selectedAttacks) && !isRSDPG(attacks)
+    if (switchingToG)   { setParameters(DEFAULT_PARAMETERS_G); setResults(null) }
+    if (switchingFromG) { setParameters(DEFAULT_PARAMETERS);   setResults(null) }
+    setSelectedAttacks(attacks)
+  }
 
   const handleCalculate = async () => {
     if (selectedAttacks.length === 0) { setError('Please select at least one attack'); return }
@@ -85,7 +97,7 @@ export function EstimatorApp() {
               <ParameterPanel parameters={parameters} onParametersChange={setParameters} onCalculate={handleCalculate} isLoading={isLoading} selectedAttacks={selectedAttacks} />
             </section>
             <section className="rounded-lg border border-slate-200 bg-white/90 p-5 shadow-sm shadow-slate-200/60">
-              <AttackSelector selectedAttacks={selectedAttacks} onAttackChange={setSelectedAttacks} />
+              <AttackSelector selectedAttacks={selectedAttacks} onAttackChange={handleAttackChange} />
             </section>
           </aside>
 
