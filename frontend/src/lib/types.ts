@@ -1,8 +1,11 @@
-export type AttackType = 'stern' | 'bjmm' | 'both'
+export type AttackType = 'stern' | 'bjmm' | 'groebner' | 'stern_g'
 
 export interface CrossParameters {
   n: number
   k: number
+  z: number
+  m?: number
+  p?: number
 }
 
 export interface DataPoint {
@@ -15,14 +18,7 @@ export interface SternResult {
   n: number
   k: number
   "n-k": number
-  time: number
-  memory: number
-  ell: number
-  optimal: {
-    ell: number
-    time: number
-    memory: number
-  }
+  optimal: { ell: number; time: number; memory: number }
   data: DataPoint[]
 }
 
@@ -31,22 +27,36 @@ export interface BJMMResult {
   n: number
   k: number
   "n-k": number
-  time: number
-  memory: number
-  ell: number
-  nu1: number
-  nu2: number
-  delta1: number
-  delta2: number
+  optimal: { ell: number; time: number; memory: number }
+  data: DataPoint[]
+}
+
+export interface GroebnerResult {
+  algorithm: string
+  n: number
+  k: number
+  z: number
+  omega: number
+  optimal: { d_reg: number; time: number | null; memory: number | null }
+}
+
+export interface SternGResult {
+  algorithm: string
+  n: number
+  k: number
+  m: number
+  z: number
   optimal: {
-    ell: number
-    time: number
-    memory: number
+    ell: number | null
+    time: number | null
+    memory: number | null
   }
   data: DataPoint[]
 }
 
 export interface EstimationResult {
-  stern?: SternResult
-  bjmm?: BJMMResult
+  stern?:    SternResult
+  bjmm?:     BJMMResult
+  groebner?: GroebnerResult
+  stern_g?:  SternGResult
 }

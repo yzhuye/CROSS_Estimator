@@ -1,6 +1,7 @@
 from cryptographic_estimators.CROSSEstimator import CROSSProblem
 from cryptographic_estimators.CROSSEstimator.CROSSAlgorithms.RSDP import Stern
 from cryptographic_estimators.CROSSEstimator.CROSSAlgorithms.RSDP.bjmm import BJMM
+from cryptographic_estimators.CROSSEstimator.CROSSAlgorithms.RSDPG import Stern_G
 from math import inf
 
 
@@ -109,4 +110,68 @@ def estimate_bjmm(n: int, k: int):
             "memory": round(best_memory, 2) if best_memory != inf else None,
         },
         "data": list(best_by_ell.values()),  # Para graficar: x=ell, y=time
+    }
+
+def estimate_groebner(n: int, k: int, z: int = 7, omega: float = 2.0):
+    """Ejecuta el estimador Gröbner (F5) sobre R-SDP. Sin parámetros optimizables."""
+    from cryptographic_estimators.CROSSEstimator.CROSSAlgorithms.groebner import Groebner
+    problem = CROSSProblem(n=n, k=k, z=z)
+    groebner = Groebner(problem, omega=omega, bit_complexities=1)
+
+    verbose_info = {}
+    params = next(groebner._valid_choices())
+    try:
+        time, memory = groebner._time_and_memory_complexity(params, verbose_information=verbose_info)
+    except Exception:
+        time, memory = inf, inf
+
+    return {
+        "algorithm": "Groebner",
+        "n": n,
+        "k": k,
+        "z": z,
+        "omega": omega,
+        "optimal": {
+            "d_reg":  verbose_info.get("d_reg"),
+            "time":   round(time,   2) if time   != inf else None,
+            "memory": round(memory, 2) if memory != inf else None,
+        },
+    }
+
+
+def estimate_stern_g(n: int, k: int, m: int, z: int = 127, p: int = 509):
+    """Ejecuta Stern_G sobre R-SDP(G). Itera sobre ell y retorna el óptimo."""
+    problem = CROSSProblem(n=n, k=k, z=z, p=p, m=m)
+    stern_g = Stern_G(problem, bit_complexities=1)
+
+    results = []
+    best_time = inf
+    best_ell = None
+    best_memory = inf
+
+    for params in stern_g._valid_choices():
+        ell = params.get("ell", 0)
+        try:
+            time, memory = stern_g._time_and_memory_complexity(params)
+            if time != inf and time > 0:
+                results.append({"ell": ell, "time": round(time, 2), "memory": round(memory, 2)})
+                if time < best_time:
+                    best_time = time
+                    best_memory = memory
+                    best_ell = ell
+        except Exception:
+            continue
+
+    return {
+        "algorithm": "Stern_G",
+        "n": n,
+        "k": k,
+        "m": m,
+        "z": z,
+        "optimal": {
+            "ell":    best_ell,
+            "time":   round(best_time,   2) if best_time   != inf else None,
+            "memory": round(best_memory, 2) if best_memory != inf else None,
+        },
+        "data": results,
     }

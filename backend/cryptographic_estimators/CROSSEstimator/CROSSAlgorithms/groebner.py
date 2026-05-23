@@ -139,7 +139,7 @@ class Groebner(CROSSAlgorithm):
         return 2 * log2_N + log2_safe(log2(p))
 
     def _time_and_memory_complexity(self, parameters: dict, verbose_information=None):
-        n, k, p, z, _, _, _ = self.problem.get_parameters()
+        n, k, p, z, _, _, _, _ = self.problem.get_parameters()
         w = n  # R-SDP estándar: peso completo
 
         d_reg = _d_reg_model(n, k, w, z, self._c)
